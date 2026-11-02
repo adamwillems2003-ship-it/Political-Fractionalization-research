@@ -1,0 +1,73 @@
+"""Download raw inputs into data/raw/. Idempotent: skips files already present."""
+import io
+import sys
+import zipfile
+from pathlib import Path
+
+import requests
+
+RAW = Path(__file__).resolve().parents[1] / "data" / "raw"
+RAW.mkdir(parents=True, exist_ok=True)
+
+SOURCES = {
+    "qog_std_ts_jan24.csv": "https://www.qogdata.pol.gu.se/data/qog_std_ts_jan24.csv",
+    "HSall_members.csv": "https://voteview.com/static/data/out/members/HSall_members.csv",
+    "rugged_data.zip": "https://diegopuga.org/data/rugged/rugged_data.zip",
+}
+
+
+def fetch(name: str, url: str) -> Path:
+    dest = RAW / name
+    if dest.exists() and dest.stat().st_size > 0:
+        print(f"[skip] {name}")
+        return dest
+    print(f"[get ] {url}")
+    with requests.get(url, stream=True, timeout=300) as r:
+        r.raise_for_status()
+        with open(dest, "wb") as f:
+            for chunk in r.iter_content(1 << 20):
+                f.write(chunk)
+    print(f"[ok  ] {name} ({dest.stat().st_size/1e6:.1f} MB)")
+    return dest
+
+
+CLARKE_FILES = {"factions.tab": 3596325, "readme.txt": 3596331}
+IMF_INDICATOR = "GGXCNL_NGDP"
+
+
+def fetch_clarke() -> None:
+    out = RAW / "clarke"
+    out.mkdir(exist_ok=True)
+    for name, fid in CLARKE_FILES.items():
+        fetch(f"clarke/{name}", f"https://dataverse.harvard.edu/api/access/datafile/{fid}?format=original")
+
+
+def fetch_imf() -> None:
+    dest = RAW / f"imf_{IMF_INDICATOR}.csv"
+    if dest.exists():
+        print(f"[skip] {dest.name}")
+        return
+    url = f"https://www.imf.org/external/datamapper/api/v1/{IMF_INDICATOR}"
+    vals = requests.get(url, timeout=120).json()["values"][IMF_INDICATOR]
+    with open(dest, "w") as f:
+        f.write("iso3,year,value\n")
+        for iso, series in vals.items():
+            for year, v in series.items():
+                f.write(f"{iso},{year},{v}\n")
+    print(f"[ok  ] {dest.name}")
+
+
+def main() -> int:
+    for name, url in SOURCES.items():
+        fetch(name, url)
+    fetch_clarke()
+    fetch_imf()
+    z = RAW / "rugged_data.zip"
+    with zipfile.ZipFile(z) as zf:
+        zf.extractall(RAW / "rugged")
+    print("[ok  ] extracted rugged_data.zip ->", sorted(p.name for p in (RAW / "rugged").iterdir()))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
