@@ -12,6 +12,17 @@ fail outright when tested:
   clustering choice, and because the US is 1 of 56 observations it does not affect the
   cross-national estimate.
 
+**Manifesto Project polarization layer (§4.5).** Seat-weighted ideological polarization from the
+party platforms is measured the same way for every country. On it, the US sits at the 57th
+percentile, unremarkable.
+
+- **Western Europe and the Americas subsample:** in the ~40 countries MARPOR covers, the
+  growth-volatility effect is conventionally significant (+0.7 to +1.0, p ≈ 0.02). But
+  weak-instrument-robust intervals include zero, and adding continent controls removes the effect.
+- **Polarization itself is *negatively* associated with growth volatility** in plain regressions
+  without instruments. This survives continent controls, but the instruments cannot move
+  polarization, so it stays a correlation.
+
 ---
 
 ## 1. First-principles critique of the original design
@@ -52,8 +63,14 @@ These are the choices I made myself. Any of them can be changed in one place in 
    - Baseline: log Maddison GDP per capita in the first democratic year, plus mean polyarchy.
    - Extended: adds distance to coast (the transport channel) and continent dummies.
    - Human capital was not added: it costs observations at this N.
-8. **Not implemented:** the MARPOR ideological layer (needs an API key, which you offered) and CLEA
-   (replaced by Golder ENPP).
+8. **MARPOR layer:** Dalton-style polarization on `rile`, weighted by seat share among parties with
+   manifesto data. Specifics:
+   - Elections where those parties hold less than 70% of seats are dropped.
+   - Each election's value is carried forward until the next election.
+   - A country needs ≥ 5 democratic years with data.
+   - Dataset version MPDS2026a.
+9. **Not implemented:** CLEA. It was replaced by Golder ENPP, which matches MARPOR's own seat
+   counts at r = 0.93 across countries.
 
 ## 3. The US Internal Effective Number of Parties
 
@@ -160,6 +177,55 @@ of up to ±δ:
 | 0.5 | [−0.38, 2.12] |
 | 1.0 | [−0.71, 2.71] |
 
+### 4.5 Manifesto Project: a symmetric ideological measure
+
+Polarization is the seat-weighted dispersion of party platforms on MARPOR's left-right `rile`
+scale, scaled 0–1. It is computed identically for all countries, so the US needs no special
+treatment.
+
+- Coverage: 40 countries in the V-Dem sample, 47 in the Polity sample.
+- Distribution: median 0.13. Range from 0.04 (Malta) to 0.26 (Israel).
+- US: 0.14, the 57th percentile.
+
+**Correlations (V-Dem sample).**
+- ENPP and polarization are distinct concepts: r = 0.40.
+- Golder ENPP vs MARPOR seat-based ENPP: r = 0.93, which validates the main fractionalization variable.
+
+**Estimates.** All 2SLS rows use the legal-origin and ruggedness instruments; the full table is
+`output/tables/marpor_polarization.csv`.
+
+| Model | Outcome | Sample | N | Coef (SE) | p | First-stage F | Anderson-Rubin 95% set |
+|---|---|---|---|---|---|---|---|
+| 2SLS frac, MARPOR subsample | growth SD | V-Dem | 40 | 1.02 (0.45) | 0.02 | 11.7 | [−0.05, 4.18] |
+| — legal origin only | growth SD | V-Dem | 40 | 0.89 (0.44) | 0.04 | 11.5 | [−0.01, 2.51] |
+| — + continents, coast | growth SD | V-Dem | 40 | 1.24 (0.89) | 0.16 | **3.3** | unbounded |
+| — controlling polarization | growth SD | V-Dem | 40 | 0.82 (0.31) | 0.009 | 21.7 | [−0.11, 1.81] |
+| 2SLS frac, MARPOR subsample | growth SD | Polity | 45 | 0.74 (0.31) | 0.02 | 29.6 | [−0.08, 1.05] |
+| — + continents, coast | growth SD | Polity | 45 | 0.58 (0.58) | 0.32 | 7.7 | (−∞, 0.98] |
+| 2SLS frac, MARPOR subsample | fiscal SD | V-Dem | 39 | −0.84 (0.60) | 0.17 | 15.7 | [−5.04, 0.38] |
+| OLS polarization | growth SD | Polity | 47 | **−15.7** (5.2) | 0.003 | — | — |
+| — + continents, coast | growth SD | Polity | 45 | **−17.3** (6.2) | 0.006 | — | — |
+| OLS polarization, + continents, coast | fiscal SD | Polity | 44 | 8.2 (4.1) | 0.046 | — | — |
+| 2SLS polarization | growth SD | Polity | 45 | −62.6 (43.3) | 0.15 | **3.1** | unbounded |
+
+**Fractionalization, MARPOR subsample.** In the ~40 well-covered democracies, the
+growth-volatility coefficient is larger and conventionally significant. Two things undercut it:
+- **Weak-instrument-robust sets include zero**, even with legal origin as the only instrument.
+- **Adding continent dummies collapses the first stage** (F 3–8) and the estimate. British legal
+  origin in this subsample is essentially the Anglosphere: UK, Ireland, US, Canada, Australia,
+  New Zealand, Cyprus, Israel and South Africa. The instrument mostly separates
+  "Anglosphere vs. continental Europe and Latin America," and region absorbs that.
+
+**Polarization.** Ideologically polarized party systems go with *smoother* growth (a 0.05 rise in
+polarization, about 1 SD, is associated with roughly 0.8 pp lower growth SD) and somewhat *more*
+volatile budgets.
+- Both associations survive continent controls.
+- The instruments do not predict polarization (F ≈ 2–4), so neither can be read causally.
+- Nine specifications per outcome and sample were run, so treat single p ≈ 0.05 results with caution.
+- This is the most interesting lead in the data: **ideological distance, not the number of
+  parties**, is what correlates with macro outcomes. It points to a different research question
+  than the one the design poses.
+
 ## 5. What would be needed for a credible test
 
 - **Within-country variation from electoral reforms.** New Zealand 1996 (first-past-the-post → MMP), Italy 1993 and 2005, Japan 1994: event study or synthetic control. This removes the need for time-invariant instruments.
@@ -173,3 +239,4 @@ of up to ±δ:
 - `output/tables/robustness_{growth_sd,fiscal_sd}.csv`, `leave_one_out_*.csv`, `conley_bounds_growth_sd.csv`
 - `output/tables/exclusion_diagnostics.csv`
 - `output/tables/us_ienp_summary.csv`, `us_ienp_correlations_104_114.csv`
+- `output/tables/marpor_polarization.csv`, `marpor_correlations_vdem.csv`

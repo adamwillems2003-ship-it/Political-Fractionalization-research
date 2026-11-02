@@ -179,6 +179,43 @@ def leave_one_out(d, y="growth_sd"):
     return base.params["frac"], out
 
 
+def marpor_analysis(dv, dp):
+    """Symmetric ideological measure: seat-weighted platform polarization (MARPOR rile)."""
+    rows = []
+    for sample, d in [("vdem", dv), ("polity", dp)]:
+        d = d.dropna(subset=["polarization"])
+        for y in ["growth_sd", "fiscal_sd"]:
+            def rec(model, res=None, o=None, **kw):
+                if o is not None:
+                    v = kw["var"]
+                    rows.append({"sample": sample, "outcome": y, "model": model, "N": int(o.nobs),
+                                 "coef": o.params[v], "se": o.bse[v], "p": o.pvalues[v],
+                                 "first_stage_F": np.nan, "AR_95CI": ""})
+                else:
+                    rows.append({"sample": sample, "outcome": y, "model": model, **{
+                        k: v for k, v in summarize("", *res, y, endog=kw["endog"]).items()
+                        if k in ("N", "coef", "se", "p", "first_stage_F", "AR_95CI")}})
+
+            rec("OLS: polarization", o=ols(d, y, ["polarization"] + BASE_X), var="polarization")
+            rec("OLS: frac (with polarization control)",
+                o=ols(d, y, ["frac", "polarization"] + BASE_X), var="frac")
+            rec("OLS: polarization (with frac control)",
+                o=ols(d, y, ["frac", "polarization"] + BASE_X), var="polarization")
+            rec("2SLS: polarization instrumented", res=iv(d, y, endog="polarization"), endog="polarization")
+            rec("OLS: polarization, extended controls",
+                o=ols(d, y, ["polarization"] + EXT_X), var="polarization")
+            rec("2SLS: frac, MARPOR subsample", res=iv(d, y), endog="frac")
+            rec("2SLS: frac, MARPOR subsample, legor_gbr only", res=iv(d, y, z=["legor_gbr"]), endog="frac")
+            rec("2SLS: frac, MARPOR subsample, extended controls", res=iv(d, y, x=EXT_X), endog="frac")
+            rec("2SLS: frac, controlling polarization", res=iv(d, y, x=BASE_X + ["polarization"]), endog="frac")
+    out = pd.DataFrame(rows)
+    out.to_csv(TAB / "marpor_polarization.csv", index=False)
+    cs = dv.dropna(subset=["polarization"])
+    corr = cs[["enpp_golder", "enpp_marpor", "polarization", "rile_range", "growth_sd", "fiscal_sd"]].corr()
+    corr.to_csv(TAB / "marpor_correlations_vdem.csv")
+    return out, corr
+
+
 def exclusion_diagnostics(d):
     """Do the instruments predict other plausible channels to volatility? (They should not, ideally.)"""
     rows = []
@@ -221,6 +258,10 @@ def main():
         print(f"coef range [{loo.coef.min():.3f}, {loo.coef.max():.3f}]; share p<0.05: {(loo.p < 0.05).mean():.2f}")
         print(pd.concat([loo.head(3), loo.tail(3)]).round(3).to_string())
     print("\n=== EXCLUSION DIAGNOSTICS ===\n" + exclusion_diagnostics(dv).round(3).to_string())
+    if dv.get("polarization") is not None and dv.polarization.notna().sum() > 10:
+        mp, mc = marpor_analysis(dv, dp)
+        print("\n=== MARPOR POLARIZATION ===\n" + mp.round(3).to_string())
+        print("\n=== MARPOR CORRELATIONS (vdem) ===\n" + mc.round(2).to_string())
     s, c = us_measure_validation()
     print("\n=== US IENP 1961-2016 ===\n" + s.round(2).to_string())
     print("\n=== US IENP correlations (Congress 104-114) ===\n" + c.round(2).to_string())

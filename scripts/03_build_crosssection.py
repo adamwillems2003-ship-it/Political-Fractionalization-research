@@ -20,6 +20,8 @@ SAMPLES = {
 }
 IENP_VARIANTS = ["ienp_gap", "ienp_silhouette", "ienp_k3", "ienp_k4", "ienp_k5",
                  "ienp_gmm_within_party", "ienp_caucus", "enpp_nominal"]
+MARPOR_VARS = ["polarization", "rile_range", "enpp_marpor"]
+MIN_YEARS_MARPOR = 5
 NP_COLS = ["isocode", "rugged", "dist_coast", "q_rule_law", "european_descent", "tropical",
            "lat", "rgdppc_1950_m", "legor_gbr", "legor_fra", "legor_deu", "legor_sca", "legor_soc",
            "cont_africa", "cont_asia", "cont_europe", "cont_oceania", "cont_north_america",
@@ -37,7 +39,13 @@ def load_panel() -> pd.DataFrame:
     us = pd.read_csv(OUT / "us_ienp_by_congress.csv")
     us_years = pd.concat([us.assign(year=us.year_start), us.assign(year=us.year_start + 1)])
     us_years = us_years[["year"] + IENP_VARIANTS].assign(iso3="USA")
-    return q.merge(us_years, on=["iso3", "year"], how="left")
+    q = q.merge(us_years, on=["iso3", "year"], how="left")
+    mp = OUT / "marpor_country_year.csv"
+    if mp.exists():
+        q = q.merge(pd.read_csv(mp), on=["iso3", "year"], how="left")
+    else:
+        q[MARPOR_VARS] = np.nan
+    return q
 
 
 def collapse(panel: pd.DataFrame, sample: str) -> pd.DataFrame:
@@ -66,6 +74,8 @@ def collapse(panel: pd.DataFrame, sample: str) -> pd.DataFrame:
         }
         for v in IENP_VARIANTS:
             row[v] = g[v].mean() if g[v].notna().any() else np.nan
+        for v in MARPOR_VARS:
+            row[v] = g[v].mean() if g[v].notna().sum() >= MIN_YEARS_MARPOR else np.nan
         rows.append(row)
     cs = pd.DataFrame(rows)
 
@@ -89,7 +99,7 @@ def main() -> None:
         cs = collapse(panel, s)
         cs.to_csv(OUT / f"crosssection_{s}.csv", index=False)
         print(f"[{s}] countries={len(cs)} with fiscal={cs.fiscal_sd.notna().sum()} "
-              f"with instruments={cs.legor_gbr.notna().sum()}")
+              f"with instruments={cs.legor_gbr.notna().sum()} with MARPOR={cs.polarization.notna().sum()}")
         us = cs[cs.iso3 == "USA"]
         print(us[["first_dem_year", "n_dem_years", "enpp_golder", "ienp_gap", "ienp_silhouette",
                   "ienp_caucus", "growth_sd"]].round(2).to_string())

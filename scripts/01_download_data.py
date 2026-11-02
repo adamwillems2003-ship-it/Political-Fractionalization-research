@@ -1,5 +1,6 @@
 """Download raw inputs into data/raw/. Idempotent: skips files already present."""
-import io
+import csv
+import os
 import sys
 import zipfile
 from pathlib import Path
@@ -57,11 +58,31 @@ def fetch_imf() -> None:
     print(f"[ok  ] {dest.name}")
 
 
+MARPOR_VERSION = "MPDS2026a"
+
+
+def fetch_marpor() -> None:
+    key = os.environ.get("MANIFESTO_API_KEY")
+    dest = RAW / f"marpor_{MARPOR_VERSION}.csv"
+    if dest.exists():
+        print(f"[skip] {dest.name}")
+        return
+    if not key:
+        print("[warn] MANIFESTO_API_KEY not set; skipping MARPOR (ideological polarization layer)")
+        return
+    url = "https://manifesto-project.wzb.eu/api/v1/get_core"
+    rows = requests.get(url, params={"key": MARPOR_VERSION, "api_key": key}, timeout=300).json()
+    with open(dest, "w", newline="") as f:
+        csv.writer(f).writerows(rows)
+    print(f"[ok  ] {dest.name}")
+
+
 def main() -> int:
     for name, url in SOURCES.items():
         fetch(name, url)
     fetch_clarke()
     fetch_imf()
+    fetch_marpor()
     z = RAW / "rugged_data.zip"
     with zipfile.ZipFile(z) as zf:
         zf.extractall(RAW / "rugged")
