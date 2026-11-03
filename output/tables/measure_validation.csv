@@ -1,0 +1,11 @@
+measure,level,N,corr_with_defection,expected_sign,validated
+"Within-party SD, Nokken-Poole dim 1",party x Congress,62,0.6794524044016658,1,True
+"Within-party SD, DW-NOMINATE dim 1",party x Congress,62,0.7478283440796601,1,True
+IENP: ienp_gap,Congress,29,-0.16533356719226075,1,False
+IENP: ienp_silhouette,Congress,29,0.8904988729525946,1,True
+IENP: ienp_k3,Congress,29,0.6237195495396042,1,True
+IENP: ienp_k4,Congress,29,0.41196635061571907,1,False
+IENP: ienp_k5,Congress,29,0.5190684668626868,1,True
+IENP: ienp_gmm_within_party,Congress,29,0.1915993936276252,1,False
+IENP: ienp_caucus,Congress,12,-0.8482810865381769,1,False
+"V-Dem v2pscohesv (party cohesion), US",year,62,-0.8808283859783924,-1,True

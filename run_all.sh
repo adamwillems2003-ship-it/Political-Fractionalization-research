@@ -9,3 +9,8 @@ fi
 python scripts/03_build_crosssection.py
 python scripts/04_estimate.py
 python scripts/05_figures.py
+python scripts/06_build_defections.py
+python scripts/07_electoral_reforms.py
+python scripts/08_us_primaries.py
+python scripts/09_symmetric_cohesion.py
+python scripts/10_figures_designs.py

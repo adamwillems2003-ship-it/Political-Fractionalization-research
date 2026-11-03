@@ -58,6 +58,32 @@ def fetch_imf() -> None:
     print(f"[ok  ] {dest.name}")
 
 
+STATLEG_FILES = {
+    "statleg/mcghee_dem.csv": "https://dataverse.harvard.edu/api/access/datafile/2443343",
+    "statleg/mcghee_rep.csv": "https://dataverse.harvard.edu/api/access/datafile/2443327",
+    "statleg/shor_mccarty_aggregate.tab": "https://dataverse.harvard.edu/api/access/datafile/2690453?format=original",
+}
+VDEM_URL = "https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData"
+
+
+def fetch_statleg() -> None:
+    (RAW / "statleg").mkdir(exist_ok=True)
+    for name, url in STATLEG_FILES.items():
+        fetch(name, url)
+
+
+def fetch_vdem_cohesion() -> None:
+    dest = RAW / "vdem_cohesion.csv"
+    if dest.exists():
+        print(f"[skip] {dest.name}")
+        return
+    import pyreadr
+    rdata = fetch("vdem.RData", VDEM_URL)
+    v = pyreadr.read_r(str(rdata))["vdem"]
+    v[["country_text_id", "year", "v2pscohesv", "v2x_polyarchy"]].to_csv(dest, index=False)
+    print(f"[ok  ] {dest.name}")
+
+
 MARPOR_VERSION = "MPDS2026a"
 
 
@@ -82,6 +108,8 @@ def main() -> int:
         fetch(name, url)
     fetch_clarke()
     fetch_imf()
+    fetch_statleg()
+    fetch_vdem_cohesion()
     fetch_marpor()
     z = RAW / "rugged_data.zip"
     with zipfile.ZipFile(z) as zf:
