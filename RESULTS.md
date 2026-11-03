@@ -1,33 +1,203 @@
-# Results (v2): Political Fractionalization and Macroeconomic Volatility
+# Results (v3): Political Fractionalization and Macroeconomic Volatility
 
-**Version 2** adds **Part II**, which carries out the three designs proposed in v1 §5
-("What would be needed for a credible test"):
-- within-country electoral reforms;
-- US primary-rule changes, with a fragmentation measure validated against roll-call defections;
-- one intra-party measure applied to every country.
+**Version 3** adds **Part III**, which follows up the open questions of v2 §II.7:
+- within-country shocks to party discipline (anti-defection laws);
+- direct tests of veto-player theory;
+- a systematic catalogue of 22 electoral reforms in place of four.
 
-All three were pre-registered in [`docs/pre_analysis_plan.md`](docs/pre_analysis_plan.md), which
-was committed and pushed (commit `eaa1cc3`) before any of their outcome regressions were run.
-**Part I**, the assessment of the original cross-sectional design, is unchanged below.
+Part III was pre-registered in [`docs/pre_analysis_plan_part3.md`](docs/pre_analysis_plan_part3.md)
+(commit `57a6546`) before its outcome regressions were run. Parts II and I are unchanged below.
 
 ## Bottom line
 
-**No credible design shows that fragmentation raises macroeconomic volatility.** Where any
-association survives, it runs the other way: more fragmented or less cohesive party systems go
-with *steadier* budgets.
+**No design that produces within-country variation shows that party fragmentation or party
+discipline moves macroeconomic volatility.** The one robust pattern, looser parties with steadier
+budgets, is a **between-country** association among established democracies. It matches the
+veto-player literature's cross-sectional findings, but it is not identified, and it does not
+appear when the same countries' cohesion changes over time.
 
 | Question | Answer |
 |---|---|
 | Does the US-only "IENP" measure fragmentation? | **Only some versions.** Validated against roll-call defections, the gap-statistic IENP (Part I's primary) fails (r = −0.17), and caucus rosters get the sign wrong (r = −0.85). Within-party ideological spread (r = 0.75), silhouette IENP (0.89) and V-Dem party cohesion (−0.88) pass. |
-| Do national electoral reforms that shift party counts shift volatility? | **No.** Reforms move ENPP a lot: New Zealand +1.5, Italy 2006 −2.4. Pooled effect per effective party: +0.09 pp on growth instability (randomization p = 0.92) and −0.03 pp on fiscal instability (p = 0.91). |
-| Do top-two primaries fragment US House parties? | **No credible evidence.** The +2.9 pp jump in defections reflects pre-existing trends and an invalid two-cluster inference: randomization p = 0.22, and within the same members +0.4 pp (p = 0.77). |
-| Do more open primaries widen state-party ideological spread? | **Weakly at most.** +0.009 SD-units per step of openness, randomization p = 0.18. A binary version reaches p = 0.02 but rests on only 9 switching state-parties. |
-| Using one measure for every country, are US parties unusually loose? | **Yes.** The US is at the 89th percentile of party incohesion among democracies. This supports the original intuition without arbitrary clustering choices. |
-| Is that looseness associated with volatility? | **Only fiscal volatility, and in the opposite direction:** −0.43 (p = 0.006, Holm-adjusted 0.04). This is the only one of the seven pre-registered tests that survives correction, and it is a correlation, not an identified effect. |
+| Do national electoral reforms that shift party counts shift volatility? | **No.** In the four-reform design (Part II): +0.09 pp per party on growth instability (randomization p = 0.92), −0.03 pp on fiscal instability (p = 0.91). Pooling 22 reforms (Part III) does not help: the Duverger direction does not predict the change in ENPP. Only 10 of 22 reforms move the expected way (first-stage p = 0.50). |
+| Do anti-defection laws tighten party discipline, and does that move budgets? | **Neither.** Across 14 dated adoptions and repeals, tightening is followed by *lower* measured cohesion (+0.17 incohesion, wrong sign, p = 0.11). Only 3 of 12 events move the expected way. Reduced form on fiscal instability: p = 0.70. |
+| Do veto players stabilize budgets within countries? | **No.** More cabinet parties, a wider coalition ideological range, and higher POLCON all have *positive* within-country point estimates (p = 0.21–0.37). The 95% intervals rule out stabilizing effects larger than 0.11–0.17 pp per SD (6–10% of the mean). |
+| Between countries? | **Yes, as the literature reports.** Countries with more formal veto points have smaller fiscal swings (−0.75 pp per SD of POLCON, p = 0.045), replicating Henisz (2004) and Fatás & Mihov (2003). |
+| Does polarization raise volatility only under single-party government (reconciling Azzimonti & Talbert)? | **No.** The interaction is zero (p = 0.995). A shift in the prime minister's party ideology does go with larger fiscal changes (+0.15 pp per left-right point, p = 0.013, secondary), under coalitions as much as single-party governments. |
+| Do top-two primaries fragment US House parties? | **No credible evidence.** Randomization p = 0.22; within the same members +0.4 pp (p = 0.77). |
+| Do more open primaries widen state-party ideological spread? | **Weakly at most.** Randomization p = 0.18 for the registered index; the binary version gives p = 0.02 but rests on only 9 switching state-parties. |
+| Are US parties unusually loose, measured the same way for every country? | **Yes.** 89th percentile of incohesion among established democracies. |
+| Is looseness associated with steadier budgets? | **Between countries, among established democracies only.** Cross-section −0.43 (Holm p = 0.04), robust to a POLCON control (−0.41, p = 0.008). Panel between-country estimate −0.17 (p = 0.10) for polyarchy > 0.7; it reverses (+0.11) when electoral democracies are included. Within countries: −0.15 (p = 0.51). |
 
-The consistent pattern fits **veto-player theory** (Tsebelis): more parties and looser discipline
-mean more actors who must agree, and so steadier policy. That is the opposite of the
-gridlock-causes-volatility story the original design assumed.
+---
+
+# Part III: Veto players and identified shocks to party discipline (pre-registered)
+
+Scripts:
+- `scripts/eventlib.py`: stacked designs with exact randomization inference;
+- `scripts/11_antidefection.py`: Design D;
+- `scripts/12_veto_players.py`: Design E;
+- `scripts/13_reform_catalogue.py`: Design F;
+- `scripts/14_part3_summary.py`: Holm adjustment and figures.
+
+## III.0 Theory: veto players instead of gridlock
+
+The original design assumed that fragmentation causes gridlock, and gridlock causes volatility.
+Veto-player theory (Tsebelis 2002) predicts the opposite. The more actors whose agreement a policy
+change needs, the larger the set of policies that cannot be overturned, so changes are smaller.
+
+Part III tests the three channels this implies:
+- **Formal veto points:** Henisz's POLCON index; the number of coalition partners and their
+  ideological range.
+- **Informal veto players:** loose party discipline, which makes individual legislators pivotal.
+- **Partisan alternation:** polarization should matter only when it produces swings between
+  single-party governments (Azzimonti & Talbert 2014).
+
+## III.1 Design D: anti-defection laws as shocks to party discipline
+
+**Events.** 14 adoptions and repeals in 7 countries, dated from the legal record
+(`data/reference/anti_defection_events.csv`, sources listed).
+- India 1985, 2003
+- Israel 1991
+- Brazil 2007 (supreme-court and electoral-court fidelity rulings)
+- New Zealand 2001, 2005 (expiry), 2018
+- South Africa 2003 (floor-crossing allowed), 2009 (abolished)
+- Papua New Guinea 2001, 2010 (struck down)
+- Ukraine 2006, 2010, 2014
+
+Controls are democracies (V-Dem polyarchy > 0.5) with no event in the ±6-year window. The design
+is a stacked, signed DiD/2SLS with stack × country and stack × year fixed effects. Inference is
+exact RI: 2,000 reassignments of each event to a random eligible control.
+
+| Outcome | First stage (incohesion) | RI p | Reduced form | RI p | 2SLS | Events |
+|---|---|---|---|---|---|---|
+| \|Δ fiscal\| **(D1)** | **+0.165** (wrong sign) | 0.11 | −0.19 | **0.70** | −1.15 | 12 |
+| \|Δ growth\| | +0.107 | 0.20 | −0.74 | 0.23 | −6.9 | 13 |
+| 5-yr SD fiscal | +0.185 | 0.09 | −0.35 | 0.42 | −1.9 | 11 |
+
+![First stages](output/figures/part3_first_stages.png)
+
+**The pre-registered relevance rule fails:** the first-stage sign is wrong, so D is uninformative.
+
+Only 3 of 12 events move cohesion in the expected direction, and the largest move goes the wrong
+way: incohesion rose by 1.0 after Ukraine imposed the imperative mandate in 2006, amid the 2006–07
+crisis.
+
+This fits the adoption literature: Nikolenyi & Shenhav (2015) show these laws are passed *during*
+defection crises. It also fits a measurement point. The laws police *exit* (switching parties).
+V-Dem cohesion measures *voice* (voting against the party on important bills). Banning exit need
+not increase voting unity.
+
+## III.2 Design E: the veto-player panel
+
+**Data.** ParlGov cabinets for 37 countries (the cabinet in office on 1 January of each year), plus
+POLCON III for 110 democracies. Two-way fixed effects, SEs clustered by country.
+
+| Test | Regressor → outcome | Coef. | SE | p | 95% CI per 1 SD | Prediction |
+|---|---|---|---|---|---|---|
+| E1 | Cabinet parties → \|Δ fiscal\| | +0.064 | 0.067 | 0.34 | [−0.09, +0.27] pp | − |
+| E2 | Cabinet ideological range → \|Δ fiscal\| | +0.077 | 0.087 | 0.37 | [−0.17, +0.45] pp | − |
+| E3 | POLCON III → \|Δ fiscal\| | +0.891 | 0.707 | 0.21 | [−0.11, +0.49] pp | − |
+| E4 | Polarization × single-party → \|Δ growth\| | +0.016 | 2.69 | 0.995 | — | + |
+| E5 (sec.) | PM-party left-right swing × single-party → \|Δ fiscal\| | −0.12 | 0.10 | 0.24 | — | + |
+
+- Mean |Δ fiscal| is 1.7–1.95 pp.
+- **Every within-country veto-player estimate has the wrong sign**, and the intervals exclude
+  stabilizing effects larger than 0.11–0.17 pp per SD.
+- **Partisan alternation does matter, but not as predicted.** In E5, the main effect of a swing in
+  the PM party's ideology is +0.15 pp per left-right point (p = 0.013) under coalitions. The
+  single-party interaction does not amplify it.
+
+**Between versus within** (Mundlak decomposition; `output/tables/incohesion_between_within.csv`):
+
+![Within vs between](output/figures/part3_within_between.png)
+
+| Model | Term | Coef. | p |
+|---|---|---|---|
+| \|Δ fiscal\| panel, polyarchy > 0.7 (70 countries) | incohesion, between | −0.167 | 0.10 |
+| | incohesion, within | −0.145 | 0.51 |
+| \|Δ fiscal\| panel, polyarchy > 0.5 (113 countries) | incohesion, between | +0.114 | 0.45 |
+| | incohesion, within | +0.023 | 0.90 |
+| Panel + country-mean POLCON | POLCON, between | **−3.48** | **0.045** |
+| C1b cross-section + mean POLCON | incohesion | **−0.41** | **0.008** |
+
+**Reading.** Veto-player stabilization is real *between* countries, both through formal veto
+points (POLCON) and, among established democracies, through loose parties. But neither formal nor
+informal veto players stabilize budgets when they change *within* a country.
+
+The most plausible explanation is that both proxy for stable traits of consensual polities:
+coalition traditions, independent fiscal institutions, corporatist bargaining. Those traits do not
+move when a cabinet gains a partner or a law changes. This also explains why Henisz's and
+Fatás-Mihov's cross-sectional results replicate here while the within-country tests fail.
+
+## III.3 Design F: a systematic electoral-reform catalogue
+
+**Events.** All changes of electoral-system family in Bormann & Golder's DES codes, 1966–2015, in
+the year after a democratic election coded the previous year: 30 events.
+- **Broad sample** (polyarchy > 0.5 the year before): 22 events, including France 1986/88,
+  Bolivia 1997, Venezuela 1993, Thailand 2001, Philippines 1998, Greece 2007/12, Bulgaria
+  2009/13, Ecuador 1998/2002, Romania 2008, Ukraine 1998, Mongolia 2012, Madagascar 1998,
+  Albania 2009, Turkey 1995.
+- **Clean sample** (polyarchy > 0.7): 11 events.
+
+The catalogue is in `data/processed/reform_catalogue.csv`. The instrument is the Duverger direction
+fixed in advance (toward PR +1, toward majoritarian −1) × post.
+
+| Sample | Outcome | First stage (ENPP) | RI p | Reduced form | RI p | Events |
+|---|---|---|---|---|---|---|
+| Broad | \|Δ growth\| **(F1)** | −0.13 (wrong sign) | 0.50 | −0.45 | **0.31** | 22 |
+| Broad | \|Δ fiscal\| **(F2)** | −0.09 (wrong sign) | 0.69 | −0.23 | **0.49** | 21 |
+| Clean | \|Δ growth\| | −0.43 (wrong sign) | 0.12 | +0.03 | 0.96 | 11 |
+| Clean | \|Δ fiscal\| | −0.35 (wrong sign) | 0.20 | −0.61 | 0.14 | 11 |
+
+**More events did not buy power.** The a priori direction of a reform does not predict where party
+counts go within ten years. Only 10 of 22 reforms move ENPP the expected way. Of the three
+significant movers, one goes as expected and two go against it:
+- Madagascar 1998: −4.1 parties after a move toward majoritarian rules (as expected);
+- Thailand 2001: −3.1 after a move "toward PR" (against);
+- Italy 2006: −2.3 under proportional representation with a majority bonus (against).
+
+This is Colomer's (2005) "Duverger's laws upside down" pattern. Fragmented party systems adopt
+proportional rules, and party systems then consolidate. Mixed and bonus systems also blur DES's
+three-family coding. The 2SLS estimates (+2.6 to +3.4) are therefore meaningless. All reduced
+forms are null.
+
+## III.4 Primary hypothesis family (Holm, 7 tests)
+
+| Test | Hypothesis | Estimate | p | Inference | Holm |
+|---|---|---|---|---|---|
+| D1 | Anti-defection 2SLS: incohesion → \|Δ fiscal\| | −1.15 | 0.70 | RI | 1.00 |
+| E1 | Cabinet parties → \|Δ fiscal\| | +0.064 | 0.34 | cluster | 1.00 |
+| E2 | Cabinet ideological range → \|Δ fiscal\| | +0.077 | 0.37 | cluster | 1.00 |
+| E3 | POLCON III → \|Δ fiscal\| | +0.891 | 0.21 | cluster | 1.00 |
+| E4 | Polarization × single-party → \|Δ growth\| | +0.016 | 0.995 | cluster | 1.00 |
+| F1 | Reform catalogue 2SLS: ENPP → \|Δ growth\| | +3.39 | 0.31 | RI | 1.00 |
+| F2 | Reform catalogue 2SLS: ENPP → \|Δ fiscal\| | +2.56 | 0.49 | RI | 1.00 |
+
+**Deviations from the plan.**
+- Design D's first-stage rule triggered, so D is reported as uninformative, as registered.
+- The between/within decomposition, the POLCON-controlled C1b, and the polyarchy-threshold check
+  are **exploratory** additions, not part of the plan.
+
+## III.5 What this adds to the literature
+
+- **Veto players (Henisz 2004; Fatás & Mihov 2003; Tsebelis & Chang 2004).** Their stabilization
+  result replicates *between* countries but not *within* them, at an annual horizon. Within-country
+  intervals exclude stabilizing effects above 6–10% of mean fiscal change.
+  - Tsebelis & Chang studied budget *composition*, not the balance, so E1–E2 test a related but
+    different outcome.
+- **Party discipline.** The C1b association is new relative to the formal-veto literature and
+  survives a POLCON control. It is confined to established democracies and to between-country
+  variation. Anti-defection laws cannot serve as an instrument: they don't move voting cohesion,
+  in line with Nikolenyi & Shenhav (2015) on why such laws are adopted.
+- **Electoral reform (Colomer 2005; Renwick 2010).** Across 22 reforms, the Duverger direction
+  predicts ENPP change at chance level, which quantifies Colomer's reverse-causation argument.
+  Reform-based instruments for party-system fragmentation are therefore weak *by construction*,
+  not just for lack of events.
+- **Polarization (Azzimonti & Talbert 2014; Frye 2002).** Their mechanism needs polarization to
+  turn into single-party alternation. We find no polarization × single-party interaction among
+  ParlGov democracies. We do find that ideological swings in the PM's party enlarge fiscal changes,
+  so partisan turnover matters regardless of government type.
 
 ---
 
@@ -213,20 +383,17 @@ document's premise survives; its measurement strategy does not.
 B1 shows why the inference correction matters. As registered (clustered), it is the strongest
 "finding" in the study. Under valid inference it disappears.
 
-## II.7 What remains open
+## II.7 What remained open (addressed in Part III)
 
-- **The robust correlation:** less cohesive and more fragmented party systems run steadier
-  budgets (C1b; also Part I's negative fiscal 2SLS estimates). It is not identified: no instrument
-  moves cohesion.
-  - A test would need within-country shocks to party discipline, for example rule changes on
-    candidate selection or anti-defection laws (India 1985, Brazil 2007 fidelity rulings).
-  - The theoretical frame should be **veto players**, not gridlock-driven volatility.
-- **Power.** Four national reforms and two top-two states give coarse inference by construction.
-  Pooling more reforms needs a systematic electoral-reform catalogue (Renwick 2010; Bormann &
-  Golder's system codes). Candidates include France 1986/88, Bolivia 1994, Venezuela 1993 and
-  Thailand 1997. Most are outside the clean-democracy sample.
-- **MARPOR within-party dispersion** remains infeasible: there is one manifesto per party per
-  election. V-Dem cohesion is the symmetric alternative actually used.
+- **Identification of the cohesion association.** Anti-defection laws were tested as within-country
+  shocks to party discipline in Part III (Design D). They fail as an instrument.
+- **Theoretical frame.** Veto players: tested directly in Part III (Design E).
+- **Power.** A systematic electoral-reform catalogue (Bormann & Golder codes, 22 reforms) is in
+  Part III (Design F).
+- **MARPOR within-party dispersion.** The core dataset has one manifesto per party per election, so
+  it cannot measure a party's internal spread. The Manifesto *Corpus* (sentence-coded texts,
+  available with the same API key) could measure programmatic heterogeneity within a manifesto.
+  That is not built yet, and it would be exploratory.
 
 ---
 

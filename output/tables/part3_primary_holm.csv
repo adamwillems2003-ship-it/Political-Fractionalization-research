@@ -1,0 +1,8 @@
+test,hypothesis,estimate,p,inference,holm
+D1,Anti-defection 2SLS: incohesion → |Δ fiscal|,-1.154461115664887,0.695,RI (reduced form),1.0
+E1,Cabinet parties → |Δ fiscal| (TWFE),0.06418659972865506,0.3374247722273661,cluster,1.0
+E2,Cabinet ideological range → |Δ fiscal| (TWFE),0.0772684935859674,0.37162950468189104,cluster,1.0
+E3,POLCON III → |Δ fiscal| (TWFE),0.8913028417519431,0.2074545899197069,cluster,1.0
+E4,Polarization × single-party → |Δ growth| (TWFE),0.015645033582683134,0.9953580208123994,cluster,1.0
+F1,Reform catalogue 2SLS: ENPP → |Δ growth|,3.3900913955079,0.305,RI (reduced form),1.0
+F2,Reform catalogue 2SLS: ENPP → |Δ fiscal|,2.5607970314751523,0.492,RI (reduced form),1.0

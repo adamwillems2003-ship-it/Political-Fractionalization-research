@@ -14,3 +14,8 @@ python scripts/07_electoral_reforms.py
 python scripts/08_us_primaries.py
 python scripts/09_symmetric_cohesion.py
 python scripts/10_figures_designs.py
+cd scripts
+python 11_antidefection.py
+python 12_veto_players.py
+python 13_reform_catalogue.py
+python 14_part3_summary.py

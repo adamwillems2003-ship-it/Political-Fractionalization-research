@@ -84,6 +84,15 @@ def fetch_vdem_cohesion() -> None:
     print(f"[ok  ] {dest.name}")
 
 
+PARLGOV_URL = "https://parlgov.org/data/parlgov-development_csv-utf-8/{}.csv"
+
+
+def fetch_parlgov() -> None:
+    (RAW / "parlgov").mkdir(exist_ok=True)
+    for view in ["view_cabinet", "view_party", "view_election"]:
+        fetch(f"parlgov/{view}.csv", PARLGOV_URL.format(view))
+
+
 MARPOR_VERSION = "MPDS2026a"
 
 
@@ -110,6 +119,7 @@ def main() -> int:
     fetch_imf()
     fetch_statleg()
     fetch_vdem_cohesion()
+    fetch_parlgov()
     fetch_marpor()
     z = RAW / "rugged_data.zip"
     with zipfile.ZipFile(z) as zf:
