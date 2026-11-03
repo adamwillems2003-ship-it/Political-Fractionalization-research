@@ -93,6 +93,25 @@ def fetch_parlgov() -> None:
         fetch(f"parlgov/{view}.csv", PARLGOV_URL.format(view))
 
 
+IMF_EXTRA = ["exp", "G_X_G01_GDP_PT"]
+VPARTY_URL = "https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vparty.RData"
+
+
+def fetch_imf_expenditure() -> None:
+    for code in IMF_EXTRA:
+        dest = RAW / f"imf_{code}.csv"
+        if dest.exists():
+            print(f"[skip] {dest.name}")
+            continue
+        vals = requests.get(f"https://www.imf.org/external/datamapper/api/v1/{code}", timeout=120).json()["values"][code]
+        with open(dest, "w") as f:
+            f.write("iso3,year,value\n")
+            for iso, series in vals.items():
+                for year, v in series.items():
+                    f.write(f"{iso},{year},{v}\n")
+        print(f"[ok  ] {dest.name}")
+
+
 MARPOR_VERSION = "MPDS2026a"
 
 
@@ -120,6 +139,8 @@ def main() -> int:
     fetch_statleg()
     fetch_vdem_cohesion()
     fetch_parlgov()
+    fetch_imf_expenditure()
+    fetch("vparty.RData", VPARTY_URL)
     fetch_marpor()
     z = RAW / "rugged_data.zip"
     with zipfile.ZipFile(z) as zf:

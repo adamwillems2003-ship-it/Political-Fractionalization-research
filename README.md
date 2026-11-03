@@ -17,7 +17,12 @@ Does party-system fragmentation cause macroeconomic volatility?
   - direct veto-player tests (ParlGov cabinets, Henisz POLCON);
   - a systematic catalogue of 22 electoral reforms (Bormann & Golder codes).
 
-**Findings, critique, design choices and deviations are in [`RESULTS.md`](RESULTS.md).**
+- **Part IV** ([`docs/pre_analysis_plan_part4.md`](docs/pre_analysis_plan_part4.md)):
+  - veto players and budget punctuation (IMF COFOG, 73 countries);
+  - candidate selection → party cohesion (V-Party).
+
+**Findings, critique, design choices and deviations:** Parts I–III in [`RESULTS.md`](RESULTS.md);
+Part IV in [`RESULTS_V2.md`](RESULTS_V2.md).
 
 ## Reproduce
 
@@ -48,6 +53,9 @@ Keep the API key in your shell or a git-ignored `.env`; it is never written to t
 | Design E: veto-player panel | `scripts/12_veto_players.py` | `output/tables/veto_player_panel.csv`, `incohesion_between_within.csv` |
 | Design F: electoral-reform catalogue | `scripts/13_reform_catalogue.py` | `data/processed/reform_catalogue.csv`, `output/tables/reform_catalogue_*.csv` |
 | Part III Holm family + figures | `scripts/14_part3_summary.py` | `output/tables/part3_primary_holm.csv`, `output/figures/part3_*.png` |
+| Design G: budget punctuation | `scripts/15_budget_punctuation.py` | `output/tables/budget_punctuation*.csv` |
+| Design H: V-Party candidate selection | `scripts/16_vparty.py` | `output/tables/vparty_*.csv` |
+| Part IV Holm family + figures | `scripts/17_part4_summary.py` | `output/tables/part4_primary_holm.csv`, `output/figures/part4_*.png` |
 
 ## Data sources
 
@@ -68,6 +76,9 @@ Keep the API key in your shell or a git-ignored `.env`; it is never written to t
 | Formal veto points | `h_polcon3` (Henisz POLCON III) | QoG |
 | Electoral-system family | `gol_est` (Bormann & Golder DES) | QoG |
 | Anti-defection law dates | 14 adoptions and repeals | Hand-coded from the legal record: `data/reference/anti_defection_events.csv` (sources per row) |
+| Budget composition | `gfs_*` (IMF GFS COFOG, 10 functions) | QoG |
+| Government expenditure, % GDP | `exp` (Public Finances in Modern History), `G_X_G01_GDP_PT` (Fiscal Monitor) | IMF DataMapper API |
+| Party organization (party × election) | `v2panom`, `v2padisa`, `v2paind`, `v2pagovsup`, `v2paseatshare` | V-Party v2 (via `vdeminstitute/vdemdata`) |
 | State-legislature party spread | `h_dem_sd`, `h_rep_sd`, `s_*_sd` | Shor & McCarty (2011), Harvard Dataverse doi:10.7910/DVN/K7ELHW |
 
 Not used: CLEA (blocked to automated access). It is replaced by Golder ENPP, which uses the same

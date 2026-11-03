@@ -1,0 +1,7 @@
+test,hypothesis,predicted_sign,estimate,p,holm
+G1,POLCON → budget composition distance,−,-3.110666130334943,0.2661593261349615,1.0
+G2,POLCON → median |real function change|,−,-0.04486646636525896,0.34303130174749963,1.0
+G3,POLCON → share of large (>25%) changes,+,-0.07173467998940841,0.47828184407547214,1.0
+G4,POLCON → L-kurtosis (country-decade),+,0.15659402767223837,0.50062016348984,1.0
+H1,Lagged nomination inclusiveness → party cohesion,−,-0.044565163443838485,0.5290481909402822,1.0
+H3,Governing-party cohesion → |Δ fiscal|,+,-0.05979992033846826,0.49962886628499315,1.0

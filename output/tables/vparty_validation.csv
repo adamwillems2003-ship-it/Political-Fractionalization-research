@@ -1,0 +1,3 @@
+check,N,r,threshold,passed,within_party_sd_v2padisa
+US parties: v2padisa vs House defection rate,50,0.8062681268928055,<= -0.5,False,0.17095007917880695
+Seat-weighted v2padisa vs V-Dem v2pscohesv (country-election),1703,0.3172844933429143,>= 0.5,False,

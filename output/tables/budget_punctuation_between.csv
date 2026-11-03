@@ -1,0 +1,2 @@
+model,coef,se,p,N
+"L-kurtosis ~ POLCON, decade FE only (between)",0.12989156937698113,0.09180123124668876,0.1570914062348822,120

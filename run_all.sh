@@ -19,3 +19,6 @@ python 11_antidefection.py
 python 12_veto_players.py
 python 13_reform_catalogue.py
 python 14_part3_summary.py
+python 15_budget_punctuation.py
+python 16_vparty.py
+python 17_part4_summary.py
